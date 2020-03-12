@@ -1,7 +1,7 @@
 use crate::Ipv4Address;
 
 pub trait SocketAddressV4 {
-    type IpAddress: Ipv4Address;
+    type IpAddress: Ipv4Address + Copy;
 
     fn new(ip: Self::IpAddress, port: u16) -> Self;
 

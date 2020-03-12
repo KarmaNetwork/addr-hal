@@ -1,7 +1,7 @@
 use crate::Ipv6Address;
 
 pub trait SocketAddressV6 {
-    type IpAddress: Ipv6Address;
+    type IpAddress: Ipv6Address + Copy;
 
     fn new(ip: Self::IpAddress, port: u16, flowinfo: u32, scope_id: u32) -> Self;
 
