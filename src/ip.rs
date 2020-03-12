@@ -1,12 +1,12 @@
 use crate::{Ipv4Address, Ipv6Address};
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash, PartialOrd, Ord)]
-pub enum IpAddr<IV4: Ipv4Address<IV6>, IV6: Ipv6Address<IV4>> {
+pub enum IpAddr<IV4: Ipv4Address, IV6: Ipv6Address> {
     V4(IV4),
     V6(IV6),
 }
 
-impl<IV4: Ipv4Address<IV6>, IV6: Ipv6Address<IV4>> IpAddr<IV4, IV6> {
+impl<IV4: Ipv4Address, IV6: Ipv6Address> IpAddr<IV4, IV6> {
     pub fn is_documentation(&self) -> bool {
         match self {
             IpAddr::V4(ip) => ip.is_documentation(),
@@ -57,32 +57,42 @@ impl<IV4: Ipv4Address<IV6>, IV6: Ipv6Address<IV4>> IpAddr<IV4, IV6> {
     }
 }
 
-/* impl<IV4: Ipv4Address<IV6>, IV6: Ipv6Address<IV4>> From<[u16; 8]> for IpAddr<IV4, IV6> { */
-// fn from(segments: [u16; 8]) -> Self {
-//     IpAddr::V6(IV6::from(segments))
-// }
-/* } */
+impl<IV4: Ipv4Address, IV6: Ipv6Address> From<[u16; 8]> for IpAddr<IV4, IV6> {
+    fn from(segments: [u16; 8]) -> Self {
+        let [a, b, c, d, e, f, g, h] = segments;
+        IpAddr::V6(IV6::new(a, b, c, d, e, f, g, h))
+    }
+}
 
-/* impl<IV4: Ipv4Address<IV6>, IV6: Ipv6Address<IV4>> From<[u8; 16]> for IpAddr<IV4, IV6> { */
-//     fn from(octets: [u8; 16]) -> Self {
-//         IpAddr::V6(IV6::from(octets))
-//     }
-// }
-//
-// impl<IV4: Ipv4Address<IV6>, IV6: Ipv6Address<IV4>> From<[u8; 4]> for IpAddr<IV4, IV6> {
-//     fn from(octets: [u8; 4]) -> Self {
-//         IpAddr::V4(IV4::from(octets))
-//     }
-/* } */
+impl<IV4: Ipv4Address, IV6: Ipv6Address> From<[u8; 16]> for IpAddr<IV4, IV6> {
+    fn from(octets: [u8; 16]) -> Self {
+        let [a0, a1, b0, b1, c0, c1, d0, d1, e0, e1, f0, f1, g0, g1, h0, h1] = octets;
+        let a = u16::from_be_bytes([a0, a1]);
+        let b = u16::from_be_bytes([b0, b1]);
+        let c = u16::from_be_bytes([c0, c1]);
+        let d = u16::from_be_bytes([d0, d1]);
+        let e = u16::from_be_bytes([e0, e1]);
+        let f = u16::from_be_bytes([f0, f1]);
+        let g = u16::from_be_bytes([g0, g1]);
+        let h = u16::from_be_bytes([h0, h1]);
+        IpAddr::V6(IV6::new(a, b, c, d, e, f, g, h))
+    }
+}
 
-/* impl<IV4: Ipv4Address<IV6>, IV6: Ipv6Address<IV4>> From<IV6> for IpAddr<IV4, IV6> { */
-//     fn from(addr: IV6) -> Self {
-//         IpAddr::V6(addr)
-//     }
-// }
-//
-// impl<IV4: Ipv4Address<IV6>, IV6: Ipv6Address<IV4>> From<IV4> for IpAddr<IV4, IV6> {
-//     fn from(addr: IV4) -> Self {
-//         IpAddr::V4(addr)
-//     }
-/* } */
+impl<IV4: Ipv4Address, IV6: Ipv6Address> From<[u8; 4]> for IpAddr<IV4, IV6> {
+    fn from(octets: [u8; 4]) -> Self {
+        let [a, b, c, d] = octets;
+        IpAddr::V4(IV4::new(a, b, c, d))
+    }
+}
+
+impl<IV4: Ipv4Address, IV6: Ipv6Address> From<IV4> for IpAddr<IV4, IV6> {
+    fn from(ipv4: IV4) -> Self {
+        IpAddr::V4(ipv4)
+    }
+}
+
+// TODO: impl Display
+// TODO: impl IV4
+// TODO: impl IV6
+

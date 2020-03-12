@@ -1,25 +1,9 @@
-use crate::{IpAddr, Ipv6Address};
-use core::fmt::{Debug, Display};
-use core::hash::Hash;
-use core::str::FromStr;
+// use crate::{IpAddr, Ipv6Address};
+// use core::fmt::{Debug, Display};
+// use core::hash::Hash;
+// use core::str::FromStr;
 
-pub trait Ipv4Address<V6Half: Ipv6Address<Self>>:
-    Clone
-    + Copy
-    + Debug
-    + Display
-    + Eq
-    + From<[u8; 4]>
-    + From<Self>
-    + From<u32>
-    + FromStr
-    + Hash
-    + Ord
-    + PartialEq<IpAddr<Self, V6Half>>
-    + PartialEq<Self>
-    + PartialOrd<IpAddr<Self, V6Half>>
-    + PartialOrd<Self>
-{
+pub trait Ipv4Address {
     const LOCALHOST: Self;
 
     const UNSPECIFIED: Self;

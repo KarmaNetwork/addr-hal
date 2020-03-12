@@ -1,27 +1,13 @@
-use crate::{IpAddr, Ipv4Address};
-use core::fmt::{Debug, Display};
-use core::hash::Hash;
-use core::str::FromStr;
+// use crate::{IpAddr, Ipv4Address};
+// use core::fmt::{Debug, Display};
+// use core::hash::Hash;
+// use core::str::FromStr;
 
-pub trait Ipv6Address<V4Half: Ipv4Address<Self>>:
-    Clone
-    + Copy
-    + Debug
-    + Display
-    + Eq
-    + From<[u16; 8]>
-    + From<[u8; 16]>
-    + From<Self>
-    + From<u128>
-    + FromStr
-    + Hash
-    + Ord
-    + PartialEq<IpAddr<V4Half, Self>>
-    + PartialEq<Self>
-    + PartialOrd<IpAddr<V4Half, Self>>
-    + PartialOrd<Self>
-{
-    // pub trait Ipv6Address: AsInner + FromInner {
+pub trait Ipv6Address {
+    const LOCALHOST: Self;
+
+    const UNSPECIFIED: Self;
+
     fn new(a: u16, b: u16, c: u16, d: u16, e: u16, f: u16, g: u16, h: u16) -> Self;
 
     fn segments(&self) -> [u16; 8];

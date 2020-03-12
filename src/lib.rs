@@ -1,5 +1,10 @@
 #![no_std]
 
+/* mod error; */
+/* pub use error::AddrParseError; */
+
+pub mod parser;
+
 mod ipv4;
 pub use ipv4::Ipv4Address;
 
