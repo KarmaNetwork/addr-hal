@@ -24,11 +24,11 @@ mod impl_type {
         pub port: u16,
     }
 
-    pub struct SocketAddrV4<I: Ipv4Address> {
+    pub struct SocketAddrV4<I: Ipv4Address + Copy> {
         inner: SocketAddrV4Inner<I>,
     }
 
-    impl<I: Ipv4Address> SocketAddressV4 for SocketAddrV4<I> {
+    impl<I: Ipv4Address + Copy> SocketAddressV4 for SocketAddrV4<I> {
         type IpAddress = I;
 
         fn new(ip: Self::IpAddress, port: u16) -> Self {

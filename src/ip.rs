@@ -1,11 +1,12 @@
 use crate::{Ipv4Address, Ipv6Address};
 
-pub enum IpAddr<IV4: Ipv4Address, IV6: Ipv6Address> {
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash, PartialOrd, Ord)]
+pub enum IpAddr<IV4: Ipv4Address<IV6>, IV6: Ipv6Address<IV4>> {
     V4(IV4),
     V6(IV6),
 }
 
-impl<IV4: Ipv4Address, IV6: Ipv6Address> IpAddr<IV4, IV6> {
+impl<IV4: Ipv4Address<IV6>, IV6: Ipv6Address<IV4>> IpAddr<IV4, IV6> {
     pub fn is_documentation(&self) -> bool {
         match self {
             IpAddr::V4(ip) => ip.is_documentation(),
@@ -55,3 +56,33 @@ impl<IV4: Ipv4Address, IV6: Ipv6Address> IpAddr<IV4, IV6> {
         }
     }
 }
+
+/* impl<IV4: Ipv4Address<IV6>, IV6: Ipv6Address<IV4>> From<[u16; 8]> for IpAddr<IV4, IV6> { */
+// fn from(segments: [u16; 8]) -> Self {
+//     IpAddr::V6(IV6::from(segments))
+// }
+/* } */
+
+/* impl<IV4: Ipv4Address<IV6>, IV6: Ipv6Address<IV4>> From<[u8; 16]> for IpAddr<IV4, IV6> { */
+//     fn from(octets: [u8; 16]) -> Self {
+//         IpAddr::V6(IV6::from(octets))
+//     }
+// }
+//
+// impl<IV4: Ipv4Address<IV6>, IV6: Ipv6Address<IV4>> From<[u8; 4]> for IpAddr<IV4, IV6> {
+//     fn from(octets: [u8; 4]) -> Self {
+//         IpAddr::V4(IV4::from(octets))
+//     }
+/* } */
+
+/* impl<IV4: Ipv4Address<IV6>, IV6: Ipv6Address<IV4>> From<IV6> for IpAddr<IV4, IV6> { */
+//     fn from(addr: IV6) -> Self {
+//         IpAddr::V6(addr)
+//     }
+// }
+//
+// impl<IV4: Ipv4Address<IV6>, IV6: Ipv6Address<IV4>> From<IV4> for IpAddr<IV4, IV6> {
+//     fn from(addr: IV4) -> Self {
+//         IpAddr::V4(addr)
+//     }
+/* } */

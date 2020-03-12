@@ -34,11 +34,11 @@ mod impl_type {
         pub scope_id: u32,
     }
 
-    pub struct SocketAddrV6<I: Ipv6Address> {
+    pub struct SocketAddrV6<I: Ipv6Address + Copy> {
         inner: SocketAddrV6Inner<I>,
     }
 
-    impl<I: Ipv6Address> SocketAddressV6 for SocketAddrV6<I> {
+    impl<I: Ipv6Address + Copy> SocketAddressV6 for SocketAddrV6<I> {
         type IpAddress = I;
 
         fn new(ip: Self::IpAddress, port: u16, flowinfo: u32, scope_id: u32) -> Self {

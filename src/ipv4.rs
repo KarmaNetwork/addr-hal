@@ -1,4 +1,31 @@
-pub trait Ipv4Address {
+use crate::{IpAddr, Ipv6Address};
+use core::fmt::{Debug, Display};
+use core::hash::Hash;
+use core::str::FromStr;
+
+pub trait Ipv4Address<V6Half: Ipv6Address<Self>>:
+    Clone
+    + Copy
+    + Debug
+    + Display
+    + Eq
+    + From<[u8; 4]>
+    + From<Self>
+    + From<u32>
+    + FromStr
+    + Hash
+    + Ord
+    + PartialEq<IpAddr<Self, V6Half>>
+    + PartialEq<Self>
+    + PartialOrd<IpAddr<Self, V6Half>>
+    + PartialOrd<Self>
+{
+    const LOCALHOST: Self;
+
+    const UNSPECIFIED: Self;
+
+    const BROADCAST: Self;
+
     fn new(a: u8, b: u8, c: u8, d: u8) -> Self;
 
     fn octets(&self) -> [u8; 4];
@@ -86,38 +113,3 @@ pub trait Ipv4Address {
         }
     }
 }
-
-#[cfg(feature = "impl-type")]
-pub struct Ipv4Addr {
-    inner: [u8; 4],
-}
-
-#[cfg(feature = "impl-type")]
-impl Ipv4Address for Ipv4Addr {
-    fn new(a: u8, b: u8, c: u8, d: u8) -> Self {
-        Ipv4Addr {
-            inner: [a, b, c, d],
-        }
-    }
-
-    fn octets(&self) -> [u8; 4] {
-        self.inner.clone()
-    }
-}
-
-/* #[cfg(feature = "impl-type")] */
-// impl AsInner for Ipv4Addr {
-//     type Inner = [u8; 4];
-//
-//     fn as_inner(&self) -> &Self::Inner {
-//         &self.inner
-//     }
-// }
-//
-// #[cfg(feature = "impl-type")]
-// impl FromInner for Ipv4Addr {
-//     type Inner = [u8; 4];
-//     fn from_inner(inner: Self::Inner) -> Self {
-//         Ipv4Addr { inner }
-//     }
-/* } */

@@ -1,5 +1,7 @@
 use crate::{IpAddr, SocketAddressV4, SocketAddressV6};
+use core::iter::Iterator;
 
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
 pub enum SocketAddr<SA4: SocketAddressV4, SA6: SocketAddressV6> {
     V4(SA4),
     V6(SA6),
@@ -55,4 +57,27 @@ impl<SA4: SocketAddressV4, SA6: SocketAddressV6> SocketAddr<SA4, SA6> {
             SocketAddr::V6(_) => true,
         }
     }
+}
+
+impl<
+        SA4: SocketAddressV4,
+        SA6: SocketAddressV6,
+        I: Into<IpAddr<SA4::IpAddress, SA6::IpAddress>>,
+    > From<(I, u16)> for SocketAddr<SA4, SA6>
+{
+    fn from(addr: (I, u16)) -> Self {
+        SocketAddr::new(addr.0.into(), addr.1)
+    }
+}
+
+pub enum ToSocketAddrError {}
+
+pub trait ToSocketAddrs {
+    type SA4: SocketAddressV4;
+
+    type SA6: SocketAddressV6;
+
+    type Iter: Iterator<Item = SocketAddr<Self::SA4, Self::SA6>>;
+
+    fn to_socket_addrs(&self) -> Result<Self::Iter, ToSocketAddrError>;
 }
