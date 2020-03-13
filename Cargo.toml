@@ -9,5 +9,5 @@ edition = "2018"
 [dependencies]
 
 [dev-dependencies]
-addr-mock = { git = "https://github.com/KarmaNetwork/addr-mock" }
+addr-mock = { path = "../addr-mock" }
 

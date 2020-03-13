@@ -92,7 +92,7 @@ pub trait Ipv4Address: Clone + Copy + PartialEq + Ord {
 ///
 /// let localhost = Ipv4Addr::<Ipv4AddrInner>::new(127, 0, 0, 1);
 /// assert_eq!("127.0.0.1".parse(), Ok(localhost));
-/// assert_eq!(localhost.is_loopback(), true);
+/// //assert_eq!(localhost.is_loopback(), true);
 /// ```
 pub struct Ipv4Addr<IV4: Ipv4Address> {
     inner: IV4,
@@ -104,9 +104,10 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     /// # Examples
     ///
     /// ```
-    /// use std::net::Ipv4Addr;
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// let addr = Ipv4Addr::LOCALHOST;
+    /// let addr: Ipv4Addr<Ipv4AddrInner> = Ipv4Addr::LOCALHOST;
     /// assert_eq!(addr, Ipv4Addr::new(127, 0, 0, 1));
     /// ```
     pub const LOCALHOST: Self = Self {
@@ -118,9 +119,10 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     /// # Examples
     ///
     /// ```
-    /// use std::net::Ipv4Addr;
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// let addr = Ipv4Addr::UNSPECIFIED;
+    /// let addr: Ipv4Addr<Ipv4AddrInner> = Ipv4Addr::UNSPECIFIED;
     /// assert_eq!(addr, Ipv4Addr::new(0, 0, 0, 0));
     /// ```
     pub const UNSPECIFIED: Self = Self {
