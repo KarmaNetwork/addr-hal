@@ -245,6 +245,24 @@ impl<IV4: Ipv4Address, IV6: Ipv6Address> PartialEq<IpAddr<IV4, IV6>> for Ipv4Add
     }
 }
 
+impl<IV4: Ipv4Address, IV6: Ipv6Address> PartialEq<Ipv6Addr<IV6>> for IpAddr<IV4, IV6> {
+    fn eq(&self, other: &Ipv6Addr<IV6>) -> bool {
+        match self {
+            IpAddr::V4(_) => false,
+            IpAddr::V6(v6) => v6 == other,
+        }
+    }
+}
+
+impl<IV4: Ipv4Address, IV6: Ipv6Address> PartialEq<IpAddr<IV4, IV6>> for Ipv6Addr<IV6> {
+    fn eq(&self, other: &IpAddr<IV4, IV6>) -> bool {
+        match other {
+            IpAddr::V4(_) => false,
+            IpAddr::V6(v6) => self == v6,
+        }
+    }
+}
+
 impl<IV4: Ipv4Address, IV6: Ipv6Address> PartialOrd<Ipv4Addr<IV4>> for IpAddr<IV4, IV6> {
     fn partial_cmp(&self, other: &Ipv4Addr<IV4>) -> Option<Ordering> {
         match self {
@@ -263,6 +281,24 @@ impl<IV4: Ipv4Address, IV6: Ipv6Address> PartialOrd<IpAddr<IV4, IV6>> for Ipv4Ad
     }
 }
 
+impl<IV4: Ipv4Address, IV6: Ipv6Address> PartialOrd<Ipv6Addr<IV6>> for IpAddr<IV4, IV6> {
+    fn partial_cmp(&self, other: &Ipv6Addr<IV6>) -> Option<Ordering> {
+        match self {
+            IpAddr::V4(_) => Some(Ordering::Less),
+            IpAddr::V6(v6) => v6.partial_cmp(other),
+        }
+    }
+}
+
+impl<IV4: Ipv4Address, IV6: Ipv6Address> PartialOrd<IpAddr<IV4, IV6>> for Ipv6Addr<IV6> {
+    fn partial_cmp(&self, other: &IpAddr<IV4, IV6>) -> Option<Ordering> {
+        match other {
+            IpAddr::V4(_) => Some(Ordering::Greater),
+            IpAddr::V6(v6) => self.partial_cmp(v6),
+        }
+    }
+}
+
 impl<IV4: Ipv4Address, IV6: Ipv6Address> From<[u8; 4]> for IpAddr<IV4, IV6> {
     /// Creates an `IpAddr::V4` from a four element byte array.
     ///
@@ -276,24 +312,6 @@ impl<IV4: Ipv4Address, IV6: Ipv6Address> From<[u8; 4]> for IpAddr<IV4, IV6> {
     /// ```
     fn from(octets: [u8; 4]) -> IpAddr<IV4, IV6> {
         IpAddr::V4(Ipv4Addr::from(octets))
-    }
-}
-
-impl<IV4: Ipv4Address, IV6: Ipv6Address> PartialEq<Ipv6Addr<IV6>> for IpAddr<IV4, IV6> {
-    fn eq(&self, other: &Ipv6Addr<IV6>) -> bool {
-        match self {
-            IpAddr::V4(_) => false,
-            IpAddr::V6(v6) => v6 == other,
-        }
-    }
-}
-
-impl<IV4: Ipv4Address, IV6: Ipv6Address> PartialOrd<Ipv6Addr<IV6>> for IpAddr<IV4, IV6> {
-    fn partial_cmp(&self, other: &Ipv6Addr<IV6>) -> Option<Ordering> {
-        match self {
-            IpAddr::V4(_) => Some(Ordering::Less),
-            IpAddr::V6(v6) => v6.partial_cmp(other),
-        }
     }
 }
 
@@ -350,4 +368,3 @@ impl<IV4: Ipv4Address, IV6: Ipv6Address> From<[u16; 8]> for IpAddr<IV4, IV6> {
         IpAddr::V6(Ipv6Addr::from(segments))
     }
 }
-

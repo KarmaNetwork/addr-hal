@@ -58,23 +58,23 @@ impl<'a> Parser<'a> {
         })
     }
 
-    // Apply 3 parsers sequentially
-    fn read_seq_3<A, B, C, PA, PB, PC>(&mut self, pa: PA, pb: PB, pc: PC) -> Option<(A, B, C)>
-    where
-        PA: FnOnce(&mut Parser) -> Option<A>,
-        PB: FnOnce(&mut Parser) -> Option<B>,
-        PC: FnOnce(&mut Parser) -> Option<C>,
-    {
-        self.read_atomically(move |p| {
-            let a = pa(p);
-            let b = if a.is_some() { pb(p) } else { None };
-            let c = if b.is_some() { pc(p) } else { None };
-            match (a, b, c) {
-                (Some(a), Some(b), Some(c)) => Some((a, b, c)),
-                _ => None,
-            }
-        })
-    }
+    /*     // Apply 3 parsers sequentially */
+    // fn read_seq_3<A, B, C, PA, PB, PC>(&mut self, pa: PA, pb: PB, pc: PC) -> Option<(A, B, C)>
+    // where
+    //     PA: FnOnce(&mut Parser) -> Option<A>,
+    //     PB: FnOnce(&mut Parser) -> Option<B>,
+    //     PC: FnOnce(&mut Parser) -> Option<C>,
+    // {
+    //     self.read_atomically(move |p| {
+    //         let a = pa(p);
+    //         let b = if a.is_some() { pb(p) } else { None };
+    //         let c = if b.is_some() { pc(p) } else { None };
+    //         match (a, b, c) {
+    //             (Some(a), Some(b), Some(c)) => Some((a, b, c)),
+    //             _ => None,
+    //         }
+    //     })
+    /* } */
 
     // Read next char
     fn read_char(&mut self) -> Option<char> {
@@ -142,7 +142,7 @@ impl<'a> Parser<'a> {
         self.read_atomically(|p| p.read_number_impl(radix, max_digits, upto))
     }
 
-    fn read_ipv4_addr_impl<IV4: Ipv4Address>(&mut self) -> Option<Ipv4Addr<IV4>> {
+    fn read_ipv4_addr_impl(&mut self) -> Option<[u8; 4]> {
         let mut bs = [0; 4];
         let mut i = 0;
         while i < 4 {
@@ -153,15 +153,21 @@ impl<'a> Parser<'a> {
             bs[i] = self.read_number(10, 3, 0x100).map(|n| n as u8)?;
             i += 1;
         }
-        Some(Ipv4Addr::new(bs[0], bs[1], bs[2], bs[3]))
+        Some(bs)
     }
 
     // Read IPv4 address
     fn read_ipv4_addr<IV4: Ipv4Address>(&mut self) -> Option<Ipv4Addr<IV4>> {
-        self.read_atomically(|p| p.read_ipv4_addr_impl())
+        self.read_atomically(|p| {
+            if let Some(bs) = p.read_ipv4_addr_impl() {
+                Some(Ipv4Addr::new(bs[0], bs[1], bs[2], bs[3]))
+            } else {
+                None
+            }
+        })
     }
 
-    fn read_ipv6_addr_impl<IV4: Ipv4Address, IV6: Ipv6Address>(&mut self) -> Option<Ipv6Addr<IV6>> {
+    fn read_ipv6_addr_impl<IV6: Ipv6Address>(&mut self) -> Option<Ipv6Addr<IV6>> {
         fn ipv6_addr_from_head_tail<IV6: Ipv6Address>(head: &[u16], tail: &[u16]) -> Ipv6Addr<IV6> {
             assert!(head.len() + tail.len() <= 8);
             let mut gs = [0; 8];
@@ -170,23 +176,18 @@ impl<'a> Parser<'a> {
             Ipv6Addr::new(gs[0], gs[1], gs[2], gs[3], gs[4], gs[5], gs[6], gs[7])
         }
 
-        fn read_groups<IV4: Ipv4Address>(
-            p: &mut Parser,
-            groups: &mut [u16; 8],
-            limit: usize,
-        ) -> (usize, bool) {
+        fn read_groups(p: &mut Parser, groups: &mut [u16; 8], limit: usize) -> (usize, bool) {
             let mut i = 0;
             while i < limit {
                 if i < limit - 1 {
-                    let ipv4: Option<Ipv4Addr<IV4>> = p.read_atomically(|p| {
+                    let ipv4: Option<[u8; 4]> = p.read_atomically(|p| {
                         if i == 0 || p.read_given_char(':').is_some() {
-                            p.read_ipv4_addr()
+                            p.read_ipv4_addr_impl()
                         } else {
                             None
                         }
                     });
-                    if let Some(v4_addr) = ipv4 {
-                        let octets = v4_addr.octets();
+                    if let Some(octets) = ipv4 {
                         groups[i + 0] = ((octets[0] as u16) << 8) | (octets[1] as u16);
                         groups[i + 1] = ((octets[2] as u16) << 8) | (octets[3] as u16);
                         return (i + 2, true);
@@ -210,7 +211,7 @@ impl<'a> Parser<'a> {
         }
 
         let mut head = [0; 8];
-        let (head_size, head_ipv4) = read_groups::<IV4>(self, &mut head, 8);
+        let (head_size, head_ipv4) = read_groups(self, &mut head, 8);
 
         if head_size == 8 {
             return Some(Ipv6Addr::new(
@@ -231,15 +232,15 @@ impl<'a> Parser<'a> {
         let mut tail = [0; 8];
         // `::` indicates one or more groups of 16 bits of zeros
         let limit = 8 - (head_size + 1);
-        let (tail_size, _) = read_groups::<IV4>(self, &mut tail, limit);
+        let (tail_size, _) = read_groups(self, &mut tail, limit);
         Some(ipv6_addr_from_head_tail(
             &head[..head_size],
             &tail[..tail_size],
         ))
     }
 
-    fn read_ipv6_addr<IV4: Ipv4Address, IV6: Ipv6Address>(&mut self) -> Option<Ipv6Addr<IV6>> {
-        self.read_atomically(|p| p.read_ipv6_addr_impl::<IV4, IV6>())
+    fn read_ipv6_addr<IV6: Ipv6Address>(&mut self) -> Option<Ipv6Addr<IV6>> {
+        self.read_atomically(|p| p.read_ipv6_addr_impl::<IV6>())
     }
 
     /*     fn read_socket_addr_v4(&mut self) -> Option<SocketAddrV4> { */
@@ -275,8 +276,7 @@ impl<IV4: Ipv4Address, IV6: Ipv6Address> FromStr for IpAddr<IV4, IV6> {
     fn from_str(s: &str) -> Result<IpAddr<IV4, IV6>, AddrParseError> {
         if let Some(addr) = Parser::new(s).read_till_eof(|p| p.read_ipv4_addr::<IV4>()) {
             Ok(IpAddr::V4(addr))
-        } else if let Some(addr) = Parser::new(s).read_till_eof(|p| p.read_ipv6_addr::<IV4, IV6>())
-        {
+        } else if let Some(addr) = Parser::new(s).read_till_eof(|p| p.read_ipv6_addr::<IV6>()) {
             Ok(IpAddr::V6(addr))
         } else {
             Err(AddrParseError(()))
@@ -294,15 +294,15 @@ impl<IV4: Ipv4Address> FromStr for Ipv4Addr<IV4> {
     }
 }
 
-/* impl<IV6: Ipv6Address> FromStr for Ipv6Addr<IV6> { */
-// type Err = AddrParseError;
-// fn from_str(s: &str) -> Result<Ipv6Addr<IV6>, AddrParseError> {
-//     match Parser::new(s).read_till_eof(|p| p.read_ipv6_addr::<IV4, IV6>()) {
-//         Some(s) => Ok(s),
-//         None => Err(AddrParseError(())),
-//     }
-// }
-/* } */
+impl<IV6: Ipv6Address> FromStr for Ipv6Addr<IV6> {
+    type Err = AddrParseError;
+    fn from_str(s: &str) -> Result<Ipv6Addr<IV6>, AddrParseError> {
+        match Parser::new(s).read_till_eof(|p| p.read_ipv6_addr::<IV6>()) {
+            Some(s) => Ok(s),
+            None => Err(AddrParseError(())),
+        }
+    }
+}
 //
 // impl FromStr for SocketAddrV4 {
 //     type Err = AddrParseError;
@@ -349,14 +349,14 @@ impl<IV4: Ipv4Address> FromStr for Ipv4Addr<IV4> {
 /// often because it includes information only handled by a different address type.
 ///
 /// ```should_panic
-/// use no_std_net::IpAddr;
+/// use std::net::IpAddr;
 /// let _foo: IpAddr = "127.0.0.1:8080".parse().expect("Cannot handle the socket port");
 /// ```
 ///
 /// [`IpAddr`] doesn't handle the port. Use [`SocketAddr`] instead.
 ///
 /// ```
-/// use no_std_net::SocketAddr;
+/// use std::net::SocketAddr;
 ///
 /// // No problem, the `panic!` message has disappeared.
 /// let _foo: SocketAddr = "127.0.0.1:8080".parse().expect("unreachable panic");
