@@ -87,9 +87,10 @@ pub trait Ipv4Address: Clone + Copy + PartialEq + Ord {
 /// # Examples
 ///
 /// ```
-/// use std::net::Ipv4Addr;
+/// use addr_hal::Ipv4Addr;
+/// use addr_mock::Ipv4AddrInner;
 ///
-/// let localhost = Ipv4Addr::new(127, 0, 0, 1);
+/// let localhost = Ipv4Addr::<Ipv4AddrInner>::new(127, 0, 0, 1);
 /// assert_eq!("127.0.0.1".parse(), Ok(localhost));
 /// assert_eq!(localhost.is_loopback(), true);
 /// ```
