@@ -26,6 +26,6 @@ mod socket6;
 pub use socket6::SocketAddrV6;
 pub use socket6::SocketAddressV6;
 
-/* mod socket; */
-/* pub use socket::SocketAddr; */
+mod socket;
+pub use socket::SocketAddr;
 

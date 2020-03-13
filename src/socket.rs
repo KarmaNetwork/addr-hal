@@ -1,6 +1,8 @@
 use crate::{
     IpAddr, Ipv4Addr, Ipv6Addr, SocketAddrV4, SocketAddrV6, SocketAddressV4, SocketAddressV6,
 };
+use core::fmt;
+use core::hash;
 use core::iter::Iterator;
 use core::option;
 
@@ -28,7 +30,6 @@ use core::option;
 /// assert_eq!(socket.port(), 8080);
 /// assert_eq!(socket.is_ipv4(), true);
 /// ```
-#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
 pub enum SocketAddr<SA4: SocketAddressV4, SA6: SocketAddressV6> {
     /// An IPv4 socket address.
     V4(SocketAddrV4<SA4>),
@@ -213,6 +214,49 @@ impl<SA4: SocketAddressV4, SA6: SocketAddressV6> From<SocketAddrV6<SA6>> for Soc
     /// [`SocketAddr::V6`]: ../../std/net/enum.SocketAddr.html#variant.V6
     fn from(sock6: SocketAddrV6<SA6>) -> SocketAddr<SA4, SA6> {
         SocketAddr::V6(sock6)
+    }
+}
+
+impl<SA4: SocketAddressV4, SA6: SocketAddressV6> Clone for SocketAddr<SA4, SA6> {
+    fn clone(&self) -> Self {
+        match self {
+            SocketAddr::V4(a) => SocketAddr::V4(a.clone()),
+            SocketAddr::V6(a) => SocketAddr::V6(a.clone()),
+        }
+    }
+}
+
+impl<SA4: SocketAddressV4, SA6: SocketAddressV6> Copy for SocketAddr<SA4, SA6> {}
+
+impl<SA4: SocketAddressV4, SA6: SocketAddressV6> fmt::Display for SocketAddr<SA4, SA6> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}:{}", self.ip(), self.port())
+    }
+}
+
+impl<SA4: SocketAddressV4, SA6: SocketAddressV6> fmt::Debug for SocketAddr<SA4, SA6> {
+    fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(self, fmt)
+    }
+}
+
+impl<SA4: SocketAddressV4, SA6: SocketAddressV6> Eq for SocketAddr<SA4, SA6> {}
+
+impl<SA4: SocketAddressV4, SA6: SocketAddressV6> PartialEq for SocketAddr<SA4, SA6> {
+    fn eq(&self, other: &SocketAddr<SA4, SA6>) -> bool {
+        match (self, other) {
+            (SocketAddr::V4(s), SocketAddr::V4(o)) => s == o,
+            (SocketAddr::V6(s), SocketAddr::V6(o)) => s == o,
+            _ => false,
+        }
+    }
+}
+
+impl<SA4: SocketAddressV4, SA6: SocketAddressV6> hash::Hash for SocketAddr<SA4, SA6> {
+    fn hash<H: hash::Hasher>(&self, s: &mut H) {
+        let ip = self.ip();
+        let port = self.port();
+        (ip, port).hash(s)
     }
 }
 
