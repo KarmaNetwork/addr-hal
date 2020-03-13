@@ -1,4 +1,5 @@
 #![no_std]
+#![feature(const_fn)]
 
 /* mod error; */
 /* pub use error::AddrParseError; */
@@ -6,9 +7,11 @@
 pub mod parser;
 
 mod ipv4;
+pub use ipv4::Ipv4Addr;
 pub use ipv4::Ipv4Address;
 
 mod ipv6;
+pub use ipv6::Ipv6Addr;
 pub use ipv6::Ipv6Address;
 pub use ipv6::Ipv6MulticastScope;
 

@@ -6,7 +6,7 @@
 //!
 //! This module is "publicly exported" through the `FromStr` implementations below.
 
-use crate::{IpAddr, Ipv4Address, Ipv6Address};
+use crate::{IpAddr, Ipv4Addr, Ipv4Address, Ipv6Addr, Ipv6Address};
 use core::fmt;
 use core::str::FromStr;
 
@@ -142,7 +142,7 @@ impl<'a> Parser<'a> {
         self.read_atomically(|p| p.read_number_impl(radix, max_digits, upto))
     }
 
-    fn read_ipv4_addr_impl<IV4: Ipv4Address>(&mut self) -> Option<IV4> {
+    fn read_ipv4_addr_impl<IV4: Ipv4Address>(&mut self) -> Option<Ipv4Addr<IV4>> {
         let mut bs = [0; 4];
         let mut i = 0;
         while i < 4 {
@@ -153,21 +153,21 @@ impl<'a> Parser<'a> {
             bs[i] = self.read_number(10, 3, 0x100).map(|n| n as u8)?;
             i += 1;
         }
-        Some(IV4::new(bs[0], bs[1], bs[2], bs[3]))
+        Some(Ipv4Addr::new(bs[0], bs[1], bs[2], bs[3]))
     }
 
     // Read IPv4 address
-    fn read_ipv4_addr<IV4: Ipv4Address>(&mut self) -> Option<IV4> {
+    fn read_ipv4_addr<IV4: Ipv4Address>(&mut self) -> Option<Ipv4Addr<IV4>> {
         self.read_atomically(|p| p.read_ipv4_addr_impl())
     }
 
-    fn read_ipv6_addr_impl<IV4: Ipv4Address, IV6: Ipv6Address>(&mut self) -> Option<IV6> {
-        fn ipv6_addr_from_head_tail<IV6: Ipv6Address>(head: &[u16], tail: &[u16]) -> IV6 {
+    fn read_ipv6_addr_impl<IV4: Ipv4Address, IV6: Ipv6Address>(&mut self) -> Option<Ipv6Addr<IV6>> {
+        fn ipv6_addr_from_head_tail<IV6: Ipv6Address>(head: &[u16], tail: &[u16]) -> Ipv6Addr<IV6> {
             assert!(head.len() + tail.len() <= 8);
             let mut gs = [0; 8];
             gs[..head.len()].copy_from_slice(head);
             gs[(8 - tail.len())..8].copy_from_slice(tail);
-            IV6::new(gs[0], gs[1], gs[2], gs[3], gs[4], gs[5], gs[6], gs[7])
+            Ipv6Addr::new(gs[0], gs[1], gs[2], gs[3], gs[4], gs[5], gs[6], gs[7])
         }
 
         fn read_groups<IV4: Ipv4Address>(
@@ -178,7 +178,7 @@ impl<'a> Parser<'a> {
             let mut i = 0;
             while i < limit {
                 if i < limit - 1 {
-                    let ipv4: Option<IV4> = p.read_atomically(|p| {
+                    let ipv4: Option<Ipv4Addr<IV4>> = p.read_atomically(|p| {
                         if i == 0 || p.read_given_char(':').is_some() {
                             p.read_ipv4_addr()
                         } else {
@@ -213,7 +213,7 @@ impl<'a> Parser<'a> {
         let (head_size, head_ipv4) = read_groups::<IV4>(self, &mut head, 8);
 
         if head_size == 8 {
-            return Some(IV6::new(
+            return Some(Ipv6Addr::new(
                 head[0], head[1], head[2], head[3], head[4], head[5], head[6], head[7],
             ));
         }
@@ -238,7 +238,7 @@ impl<'a> Parser<'a> {
         ))
     }
 
-    fn read_ipv6_addr<IV4: Ipv4Address, IV6: Ipv6Address>(&mut self) -> Option<IV6> {
+    fn read_ipv6_addr<IV4: Ipv4Address, IV6: Ipv6Address>(&mut self) -> Option<Ipv6Addr<IV6>> {
         self.read_atomically(|p| p.read_ipv6_addr_impl::<IV4, IV6>())
     }
 
@@ -273,7 +273,7 @@ impl<'a> Parser<'a> {
 impl<IV4: Ipv4Address, IV6: Ipv6Address> FromStr for IpAddr<IV4, IV6> {
     type Err = AddrParseError;
     fn from_str(s: &str) -> Result<IpAddr<IV4, IV6>, AddrParseError> {
-        if let Some(addr) = Parser::new(s).read_till_eof(|p| p.read_ipv4_addr()) {
+        if let Some(addr) = Parser::new(s).read_till_eof(|p| p.read_ipv4_addr::<IV4>()) {
             Ok(IpAddr::V4(addr))
         } else if let Some(addr) = Parser::new(s).read_till_eof(|p| p.read_ipv6_addr::<IV4, IV6>())
         {
@@ -284,25 +284,25 @@ impl<IV4: Ipv4Address, IV6: Ipv6Address> FromStr for IpAddr<IV4, IV6> {
     }
 }
 
-/* impl FromStr for Ipv4Addr { */
-//     type Err = AddrParseError;
-//     fn from_str(s: &str) -> Result<Ipv4Addr, AddrParseError> {
-//         match Parser::new(s).read_till_eof(|p| p.read_ipv4_addr()) {
-//             Some(s) => Ok(s),
-//             None => Err(AddrParseError(()))
-//         }
+impl<IV4: Ipv4Address> FromStr for Ipv4Addr<IV4> {
+    type Err = AddrParseError;
+    fn from_str(s: &str) -> Result<Ipv4Addr<IV4>, AddrParseError> {
+        match Parser::new(s).read_till_eof(|p| p.read_ipv4_addr()) {
+            Some(s) => Ok(s),
+            None => Err(AddrParseError(())),
+        }
+    }
+}
+
+/* impl<IV6: Ipv6Address> FromStr for Ipv6Addr<IV6> { */
+// type Err = AddrParseError;
+// fn from_str(s: &str) -> Result<Ipv6Addr<IV6>, AddrParseError> {
+//     match Parser::new(s).read_till_eof(|p| p.read_ipv6_addr::<IV4, IV6>()) {
+//         Some(s) => Ok(s),
+//         None => Err(AddrParseError(())),
 //     }
 // }
-//
-// impl FromStr for Ipv6Addr {
-//     type Err = AddrParseError;
-//     fn from_str(s: &str) -> Result<Ipv6Addr, AddrParseError> {
-//         match Parser::new(s).read_till_eof(|p| p.read_ipv6_addr()) {
-//             Some(s) => Ok(s),
-//             None => Err(AddrParseError(()))
-//         }
-//     }
-// }
+/* } */
 //
 // impl FromStr for SocketAddrV4 {
 //     type Err = AddrParseError;
