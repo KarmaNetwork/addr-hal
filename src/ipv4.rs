@@ -12,6 +12,7 @@ use core::hash;
 /// ```rust
 ///
 /// use addr_hal::Ipv4Address;
+/// use addr_hal::Ipv4Addr;
 ///
 /// #[derive(Clone, Copy, PartialOrd, PartialEq, Eq, Ord)]
 /// struct Ipv4AddrInner {
@@ -40,6 +41,9 @@ use core::hash;
 ///         self.inner.clone()
 ///     }
 /// }
+///
+/// let ip: Ipv4Addr<Ipv4AddrInner> = "127.0.0.1".parse().unwrap();
+/// assert_eq!("127.0.0.1".parse(), Ok(ip));
 /// ```
 pub trait Ipv4Address: Clone + Copy + PartialEq + Ord {
     /// An IPv4 address with the address pointing to localhost, usually is `127.0.0.1`.
@@ -71,14 +75,14 @@ pub trait Ipv4Address: Clone + Copy + PartialEq + Ord {
 /// system.
 ///
 /// [IETF RFC 791]: https://tools.ietf.org/html/rfc791
-/// [`IpAddr`]: ../../std/net/enum.IpAddr.html
+/// [`IpAddr`]: ../addr_hal/enum.IpAddr.html
 ///
 /// # Textual representation
 ///
 /// `Ipv4Addr` provides a [`FromStr`] implementation. The four octets are in decimal
 /// notation, divided by `.` (this is called "dot-decimal notation").
 ///
-/// [`FromStr`]: ../../std/str/trait.FromStr.html
+/// [`FromStr`]: https://doc.rust-lang.org/core/str/trait.FromStr.html
 ///
 /// # Examples
 ///

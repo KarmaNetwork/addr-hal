@@ -45,6 +45,7 @@ pub trait Ipv6Address: Clone + Copy + PartialEq + PartialOrd + Eq + Ord {
     fn segments(&self) -> [u16; 8];
 }
 
+/// Ipv6 address's multicast scope.
 #[derive(Copy, PartialEq, Eq, Clone, Hash, Debug)]
 pub enum Ipv6MulticastScope {
     InterfaceLocal,
