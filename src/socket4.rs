@@ -6,7 +6,7 @@ use core::hash;
 /// Describe the internal data structure behavior of `SocketAddrV4`.
 ///
 /// You can implement this trait by yourself or use ffi for specific Platform.
-pub trait SocketAddressV4: Clone {
+pub trait SocketAddressV4: Clone + Copy {
     /// Ipv4Address inner type.
     type IpAddress: Ipv4Address;
 
@@ -52,7 +52,6 @@ pub trait SocketAddressV4: Clone {
 /// assert_eq!(socket.ip(), &Ipv4Addr::new(127, 0, 0, 1));
 /// assert_eq!(socket.port(), 8080);
 /// ```
-#[derive(Copy)]
 pub struct SocketAddrV4<SA4: SocketAddressV4> {
     inner: SA4,
 }
@@ -141,6 +140,8 @@ impl<SA4: SocketAddressV4> Clone for SocketAddrV4<SA4> {
         }
     }
 }
+
+impl<SA4: SocketAddressV4> Copy for SocketAddrV4<SA4> {}
 
 impl<SA4: SocketAddressV4> fmt::Display for SocketAddrV4<SA4> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

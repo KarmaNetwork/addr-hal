@@ -6,7 +6,10 @@
 //!
 //! This module is "publicly exported" through the `FromStr` implementations below.
 
-use crate::{IpAddr, Ipv4Addr, Ipv4Address, Ipv6Addr, Ipv6Address, SocketAddrV4, SocketAddressV4};
+use crate::{
+    IpAddr, Ipv4Addr, Ipv4Address, Ipv6Addr, Ipv6Address, SocketAddrV4, SocketAddrV6,
+    SocketAddressV4, SocketAddressV6,
+};
 use core::fmt;
 use core::str::FromStr;
 
@@ -254,21 +257,21 @@ impl<'a> Parser<'a> {
         })
     }
 
-    // fn read_socket_addr_v6(&mut self) -> Option<SocketAddrV6> {
-    //     let ip_addr = |p: &mut Parser| {
-    //         let open_br = |p: &mut Parser| p.read_given_char('[');
-    //         let ip_addr = |p: &mut Parser| p.read_ipv6_addr();
-    //         let clos_br = |p: &mut Parser| p.read_given_char(']');
-    //         p.read_seq_3(open_br, ip_addr, clos_br).map(|t| t.1)
-    //     };
-    //     let colon = |p: &mut Parser| p.read_given_char(':');
-    //     let port = |p: &mut Parser| p.read_number(10, 5, 0x10000).map(|n| n as u16);
-    //
-    //     self.read_seq_3(ip_addr, colon, port).map(|t| {
-    //         let (ip, _, port): (Ipv6Addr, char, u16) = t;
-    //         SocketAddrV6::new(ip, port, 0, 0)
-    //     })
-    /* } */
+    fn read_socket_addr_v6<SA6: SocketAddressV6>(&mut self) -> Option<SocketAddrV6<SA6>> {
+        let ip_addr = |p: &mut Parser| {
+            let open_br = |p: &mut Parser| p.read_given_char('[');
+            let ip_addr = |p: &mut Parser| p.read_ipv6_addr();
+            let clos_br = |p: &mut Parser| p.read_given_char(']');
+            p.read_seq_3(open_br, ip_addr, clos_br).map(|t| t.1)
+        };
+        let colon = |p: &mut Parser| p.read_given_char(':');
+        let port = |p: &mut Parser| p.read_number(10, 5, 0x10000).map(|n| n as u16);
+
+        self.read_seq_3(ip_addr, colon, port).map(|t| {
+            let (ip, _, port): (Ipv6Addr<SA6::IpAddress>, char, u16) = t;
+            SocketAddrV6::new(ip, port, 0, 0)
+        })
+    }
 }
 
 impl<IV4: Ipv4Address, IV6: Ipv6Address> FromStr for IpAddr<IV4, IV6> {
@@ -314,15 +317,15 @@ impl<SA4: SocketAddressV4> FromStr for SocketAddrV4<SA4> {
     }
 }
 
-// impl FromStr for SocketAddrV6 {
-//     type Err = AddrParseError;
-//     fn from_str(s: &str) -> Result<SocketAddrV6, AddrParseError> {
-//         match Parser::new(s).read_till_eof(|p| p.read_socket_addr_v6()) {
-//             Some(s) => Ok(s),
-//             None => Err(AddrParseError(())),
-//         }
-//     }
-// }
+impl<SA6: SocketAddressV6> FromStr for SocketAddrV6<SA6> {
+    type Err = AddrParseError;
+    fn from_str(s: &str) -> Result<SocketAddrV6<SA6>, AddrParseError> {
+        match Parser::new(s).read_till_eof(|p| p.read_socket_addr_v6()) {
+            Some(s) => Ok(s),
+            None => Err(AddrParseError(())),
+        }
+    }
+}
 //
 // impl FromStr for SocketAddr {
 //     type Err = AddrParseError;

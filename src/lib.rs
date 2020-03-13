@@ -21,10 +21,11 @@ pub use ip::IpAddr;
 mod socket4;
 pub use socket4::SocketAddrV4;
 pub use socket4::SocketAddressV4;
-//
-// mod socket6;
-// pub use socket6::SocketAddressV6;
-//
-// mod socket;
-// pub use socket::SocketAddr;
-/*  */
+
+mod socket6;
+pub use socket6::SocketAddrV6;
+pub use socket6::SocketAddressV6;
+
+/* mod socket; */
+/* pub use socket::SocketAddr; */
+
