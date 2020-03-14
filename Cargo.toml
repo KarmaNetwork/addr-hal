@@ -5,6 +5,7 @@ authors = ["tiannian <dtiannian@aliyun.com>"]
 edition = "2018"
 description = "Abstract for network address for std and no_std."
 license-file = "LICENSE"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

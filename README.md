@@ -1,5 +1,8 @@
 # addr-hal
+
 Abstract for network address for `std` and `no_std`.
+
+Some code from `std`.
 
 ## Design principle
 
@@ -8,7 +11,9 @@ Abstract for network address for `std` and `no_std`.
 
 ## Features
 
-- [ ] traits and enum for ip.
-- [ ] traits and enum for sockaddr.
+- [X] traits and enum for ip.
+- [X] traits and enum for sockaddr.
+
+
 
 
