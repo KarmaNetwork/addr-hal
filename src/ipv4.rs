@@ -134,9 +134,10 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     /// # Examples
     ///
     /// ```
-    /// use std::net::Ipv4Addr;
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// let addr = Ipv4Addr::BROADCAST;
+    /// let addr: Ipv4Addr<Ipv4AddrInner> = Ipv4Addr::BROADCAST;
     /// assert_eq!(addr, Ipv4Addr::new(255, 255, 255, 255));
     /// ```
     pub const BROADCAST: Self = Self {
@@ -150,9 +151,10 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     /// # Examples
     ///
     /// ```
-    /// use std::net::Ipv4Addr;
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// let addr = Ipv4Addr::new(127, 0, 0, 1);
+    /// let addr: Ipv4Addr<Ipv4AddrInner> = Ipv4Addr::new(127, 0, 0, 1);
     /// ```
     pub fn new(a: u8, b: u8, c: u8, d: u8) -> Self {
         Ipv4Addr {
@@ -165,9 +167,10 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     /// # Examples
     ///
     /// ```
-    /// use std::net::Ipv4Addr;
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// let addr = Ipv4Addr::new(127, 0, 0, 1);
+    /// let addr: Ipv4Addr<Ipv4AddrInner> = Ipv4Addr::new(127, 0, 0, 1);
     /// assert_eq!(addr.octets(), [127, 0, 0, 1]);
     /// ```
     pub fn octets(&self) -> [u8; 4] {
@@ -180,18 +183,20 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     ///
     /// [IETF RFC 2544]: https://tools.ietf.org/html/rfc2544
     /// [errata 423]: https://www.rfc-editor.org/errata/eid423
-    /// [`true`]: ../../std/primitive.bool.html
+    /// [`true`]: https://doc.rust-lang.org/std/primitive.bool.html
     ///
     /// # Examples
     ///
     /// ```
-    /// #![feature(ip)]
-    /// use std::net::Ipv4Addr;
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// assert_eq!(Ipv4Addr::new(198, 17, 255, 255).is_benchmarking(), false);
-    /// assert_eq!(Ipv4Addr::new(198, 18, 0, 0).is_benchmarking(), true);
-    /// assert_eq!(Ipv4Addr::new(198, 19, 255, 255).is_benchmarking(), true);
-    /// assert_eq!(Ipv4Addr::new(198, 20, 0, 0).is_benchmarking(), false);
+    /// type Ipv4 = Ipv4Addr<Ipv4AddrInner>;
+    ///
+    /// assert_eq!(Ipv4::new(198, 17, 255, 255).is_benchmarking(), false);
+    /// assert_eq!(Ipv4::new(198, 18, 0, 0).is_benchmarking(), true);
+    /// assert_eq!(Ipv4::new(198, 19, 255, 255).is_benchmarking(), true);
+    /// assert_eq!(Ipv4::new(198, 20, 0, 0).is_benchmarking(), false);
     /// ```
     pub fn is_benchmarking(&self) -> bool {
         self.octets()[0] == 198 && (self.octets()[1] & 0xfe) == 18
@@ -202,15 +207,18 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     /// A broadcast address has all octets set to 255 as defined in [IETF RFC 919].
     ///
     /// [IETF RFC 919]: https://tools.ietf.org/html/rfc919
-    /// [`true`]: ../../std/primitive.bool.html
+    /// [`true`]: https://doc.rust-lang.org/std/primitive.bool.html
     ///
     /// # Examples
     ///
     /// ```
-    /// use std::net::Ipv4Addr;
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// assert_eq!(Ipv4Addr::new(255, 255, 255, 255).is_broadcast(), true);
-    /// assert_eq!(Ipv4Addr::new(236, 168, 10, 65).is_broadcast(), false);
+    /// type Ipv4 = Ipv4Addr<Ipv4AddrInner>;
+    ///
+    /// assert_eq!(Ipv4::new(255, 255, 255, 255).is_broadcast(), true);
+    /// assert_eq!(Ipv4::new(236, 168, 10, 65).is_broadcast(), false);
     /// ```
     pub fn is_broadcast(&self) -> bool {
         self == &Self::BROADCAST
@@ -225,17 +233,20 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     /// - 203.0.113.0/24 (TEST-NET-3)
     ///
     /// [IETF RFC 5737]: https://tools.ietf.org/html/rfc5737
-    /// [`true`]: ../../std/primitive.bool.html
+    /// [`true`]: https://doc.rust-lang.org/std/primitive.bool.html
     ///
     /// # Examples
     ///
     /// ```
-    /// use std::net::Ipv4Addr;
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// assert_eq!(Ipv4Addr::new(192, 0, 2, 255).is_documentation(), true);
-    /// assert_eq!(Ipv4Addr::new(198, 51, 100, 65).is_documentation(), true);
-    /// assert_eq!(Ipv4Addr::new(203, 0, 113, 6).is_documentation(), true);
-    /// assert_eq!(Ipv4Addr::new(193, 34, 17, 19).is_documentation(), false);
+    /// type Ipv4 = Ipv4Addr<Ipv4AddrInner>;
+    ///
+    /// assert_eq!(Ipv4::new(192, 0, 2, 255).is_documentation(), true);
+    /// assert_eq!(Ipv4::new(198, 51, 100, 65).is_documentation(), true);
+    /// assert_eq!(Ipv4::new(203, 0, 113, 6).is_documentation(), true);
+    /// assert_eq!(Ipv4::new(193, 34, 17, 19).is_documentation(), false);
     /// ```
     pub fn is_documentation(&self) -> bool {
         match self.octets() {
@@ -266,55 +277,56 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     /// [`is_benchmarking`](#method.is_benchmarking))
     ///
     /// [ipv4-sr]: https://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xhtml
-    /// [`true`]: ../../std/primitive.bool.html
+    /// [`true`]: https://doc.rust-lang.org/std/primitive.bool.html
     ///
     /// # Examples
     ///
     /// ```
-    /// #![feature(ip)]
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// use std::net::Ipv4Addr;
+    /// type Ipv4 = Ipv4Addr<Ipv4AddrInner>;
     ///
     /// // private addresses are not global
-    /// assert_eq!(Ipv4Addr::new(10, 254, 0, 0).is_global(), false);
-    /// assert_eq!(Ipv4Addr::new(192, 168, 10, 65).is_global(), false);
-    /// assert_eq!(Ipv4Addr::new(172, 16, 10, 65).is_global(), false);
+    /// assert_eq!(Ipv4::new(10, 254, 0, 0).is_global(), false);
+    /// assert_eq!(Ipv4::new(192, 168, 10, 65).is_global(), false);
+    /// assert_eq!(Ipv4::new(172, 16, 10, 65).is_global(), false);
     ///
     /// // the 0.0.0.0/8 block is not global
-    /// assert_eq!(Ipv4Addr::new(0, 1, 2, 3).is_global(), false);
+    /// assert_eq!(Ipv4::new(0, 1, 2, 3).is_global(), false);
     /// // in particular, the unspecified address is not global
-    /// assert_eq!(Ipv4Addr::new(0, 0, 0, 0).is_global(), false);
+    /// assert_eq!(Ipv4::new(0, 0, 0, 0).is_global(), false);
     ///
     /// // the loopback address is not global
-    /// assert_eq!(Ipv4Addr::new(127, 0, 0, 1).is_global(), false);
+    /// assert_eq!(Ipv4::new(127, 0, 0, 1).is_global(), false);
     ///
     /// // link local addresses are not global
-    /// assert_eq!(Ipv4Addr::new(169, 254, 45, 1).is_global(), false);
+    /// assert_eq!(Ipv4::new(169, 254, 45, 1).is_global(), false);
     ///
     /// // the broadcast address is not global
-    /// assert_eq!(Ipv4Addr::new(255, 255, 255, 255).is_global(), false);
+    /// assert_eq!(Ipv4::new(255, 255, 255, 255).is_global(), false);
     ///
     /// // the address space designated for documentation is not global
-    /// assert_eq!(Ipv4Addr::new(192, 0, 2, 255).is_global(), false);
-    /// assert_eq!(Ipv4Addr::new(198, 51, 100, 65).is_global(), false);
-    /// assert_eq!(Ipv4Addr::new(203, 0, 113, 6).is_global(), false);
+    /// assert_eq!(Ipv4::new(192, 0, 2, 255).is_global(), false);
+    /// assert_eq!(Ipv4::new(198, 51, 100, 65).is_global(), false);
+    /// assert_eq!(Ipv4::new(203, 0, 113, 6).is_global(), false);
     ///
     /// // shared addresses are not global
-    /// assert_eq!(Ipv4Addr::new(100, 100, 0, 0).is_global(), false);
+    /// assert_eq!(Ipv4::new(100, 100, 0, 0).is_global(), false);
     ///
     /// // addresses reserved for protocol assignment are not global
-    /// assert_eq!(Ipv4Addr::new(192, 0, 0, 0).is_global(), false);
-    /// assert_eq!(Ipv4Addr::new(192, 0, 0, 255).is_global(), false);
+    /// assert_eq!(Ipv4::new(192, 0, 0, 0).is_global(), false);
+    /// assert_eq!(Ipv4::new(192, 0, 0, 255).is_global(), false);
     ///
     /// // addresses reserved for future use are not global
-    /// assert_eq!(Ipv4Addr::new(250, 10, 20, 30).is_global(), false);
+    /// assert_eq!(Ipv4::new(250, 10, 20, 30).is_global(), false);
     ///
     /// // addresses reserved for network devices benchmarking are not global
-    /// assert_eq!(Ipv4Addr::new(198, 18, 0, 0).is_global(), false);
+    /// assert_eq!(Ipv4::new(198, 18, 0, 0).is_global(), false);
     ///
     /// // All the other addresses are global
-    /// assert_eq!(Ipv4Addr::new(1, 1, 1, 1).is_global(), true);
-    /// assert_eq!(Ipv4Addr::new(80, 9, 12, 3).is_global(), true);
+    /// assert_eq!(Ipv4::new(1, 1, 1, 1).is_global(), true);
+    /// assert_eq!(Ipv4::new(80, 9, 12, 3).is_global(), true);
     /// ```
     pub fn is_global(&self) -> bool {
         match self.octets() {
@@ -349,20 +361,22 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     /// [IETF RFC 7600]: https://tools.ietf.org/html/rfc7600
     /// [IETF RFC 7723]: https://tools.ietf.org/html/rfc7723
     /// [IETF RFC 8155]: https://tools.ietf.org/html/rfc8155
-    /// [`true`]: ../../std/primitive.bool.html
+    /// [`true`]: https://doc.rust-lang.org/std/primitive.bool.html
     ///
     /// # Examples
     ///
     /// ```
-    /// #![feature(ip)]
-    /// use std::net::Ipv4Addr;
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// assert_eq!(Ipv4Addr::new(192, 0, 0, 0).is_ietf_protocol_assignment(), true);
-    /// assert_eq!(Ipv4Addr::new(192, 0, 0, 8).is_ietf_protocol_assignment(), true);
-    /// assert_eq!(Ipv4Addr::new(192, 0, 0, 9).is_ietf_protocol_assignment(), true);
-    /// assert_eq!(Ipv4Addr::new(192, 0, 0, 255).is_ietf_protocol_assignment(), true);
-    /// assert_eq!(Ipv4Addr::new(192, 0, 1, 0).is_ietf_protocol_assignment(), false);
-    /// assert_eq!(Ipv4Addr::new(191, 255, 255, 255).is_ietf_protocol_assignment(), false);
+    /// type Ipv4 = Ipv4Addr<Ipv4AddrInner>;
+    ///
+    /// assert_eq!(Ipv4::new(192, 0, 0, 0).is_ietf_protocol_assignment(), true);
+    /// assert_eq!(Ipv4::new(192, 0, 0, 8).is_ietf_protocol_assignment(), true);
+    /// assert_eq!(Ipv4::new(192, 0, 0, 9).is_ietf_protocol_assignment(), true);
+    /// assert_eq!(Ipv4::new(192, 0, 0, 255).is_ietf_protocol_assignment(), true);
+    /// assert_eq!(Ipv4::new(192, 0, 1, 0).is_ietf_protocol_assignment(), false);
+    /// assert_eq!(Ipv4::new(191, 255, 255, 255).is_ietf_protocol_assignment(), false);
     /// ```
     pub fn is_ietf_protocol_assignment(&self) -> bool {
         self.octets()[0] == 192 && self.octets()[1] == 0 && self.octets()[2] == 0
@@ -373,16 +387,19 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     /// This property is defined by [IETF RFC 3927].
     ///
     /// [IETF RFC 3927]: https://tools.ietf.org/html/rfc3927
-    /// [`true`]: ../../std/primitive.bool.html
+    /// [`true`]: https://doc.rust-lang.org/std/primitive.bool.html
     ///
     /// # Examples
     ///
     /// ```
-    /// use std::net::Ipv4Addr;
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// assert_eq!(Ipv4Addr::new(169, 254, 0, 0).is_link_local(), true);
-    /// assert_eq!(Ipv4Addr::new(169, 254, 10, 65).is_link_local(), true);
-    /// assert_eq!(Ipv4Addr::new(16, 89, 10, 65).is_link_local(), false);
+    /// type Ipv4 = Ipv4Addr<Ipv4AddrInner>;
+    ///
+    /// assert_eq!(Ipv4::new(169, 254, 0, 0).is_link_local(), true);
+    /// assert_eq!(Ipv4::new(169, 254, 10, 65).is_link_local(), true);
+    /// assert_eq!(Ipv4::new(16, 89, 10, 65).is_link_local(), false);
     /// ```
     pub fn is_link_local(&self) -> bool {
         match self.octets() {
@@ -396,15 +413,18 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     /// This property is defined by [IETF RFC 1122].
     ///
     /// [IETF RFC 1122]: https://tools.ietf.org/html/rfc1122
-    /// [`true`]: ../../std/primitive.bool.html
+    /// [`true`]: https://doc.rust-lang.org/std/primitive.bool.html
     ///
     /// # Examples
     ///
     /// ```
-    /// use std::net::Ipv4Addr;
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// assert_eq!(Ipv4Addr::new(127, 0, 0, 1).is_loopback(), true);
-    /// assert_eq!(Ipv4Addr::new(45, 22, 13, 197).is_loopback(), false);
+    /// type Ipv4 = Ipv4Addr<Ipv4AddrInner>;
+    ///
+    /// assert_eq!(Ipv4::new(127, 0, 0, 1).is_loopback(), true);
+    /// assert_eq!(Ipv4::new(45, 22, 13, 197).is_loopback(), false);
     /// ```
     pub fn is_loopback(&self) -> bool {
         self.octets()[0] == 127
@@ -416,16 +436,19 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     /// and is defined by [IETF RFC 5771].
     ///
     /// [IETF RFC 5771]: https://tools.ietf.org/html/rfc5771
-    /// [`true`]: ../../std/primitive.bool.html
+    /// [`true`]: https://doc.rust-lang.org/std/primitive.bool.html
     ///
     /// # Examples
     ///
     /// ```
-    /// use std::net::Ipv4Addr;
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// assert_eq!(Ipv4Addr::new(224, 254, 0, 0).is_multicast(), true);
-    /// assert_eq!(Ipv4Addr::new(236, 168, 10, 65).is_multicast(), true);
-    /// assert_eq!(Ipv4Addr::new(172, 16, 10, 65).is_multicast(), false);
+    /// type Ipv4 = Ipv4Addr<Ipv4AddrInner>;
+    ///
+    /// assert_eq!(Ipv4::new(224, 254, 0, 0).is_multicast(), true);
+    /// assert_eq!(Ipv4::new(236, 168, 10, 65).is_multicast(), true);
+    /// assert_eq!(Ipv4::new(172, 16, 10, 65).is_multicast(), false);
     /// ```
     pub fn is_multicast(&self) -> bool {
         self.octets()[0] >= 224 && self.octets()[0] <= 239
@@ -440,20 +463,23 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     ///  - 192.168.0.0/16
     ///
     /// [IETF RFC 1918]: https://tools.ietf.org/html/rfc1918
-    /// [`true`]: ../../std/primitive.bool.html
+    /// [`true`]: https://doc.rust-lang.org/std/primitive.bool.html
     ///
     /// # Examples
     ///
     /// ```
-    /// use std::net::Ipv4Addr;
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// assert_eq!(Ipv4Addr::new(10, 0, 0, 1).is_private(), true);
-    /// assert_eq!(Ipv4Addr::new(10, 10, 10, 10).is_private(), true);
-    /// assert_eq!(Ipv4Addr::new(172, 16, 10, 10).is_private(), true);
-    /// assert_eq!(Ipv4Addr::new(172, 29, 45, 14).is_private(), true);
-    /// assert_eq!(Ipv4Addr::new(172, 32, 0, 2).is_private(), false);
-    /// assert_eq!(Ipv4Addr::new(192, 168, 0, 2).is_private(), true);
-    /// assert_eq!(Ipv4Addr::new(192, 169, 0, 2).is_private(), false);
+    /// type Ipv4 = Ipv4Addr<Ipv4AddrInner>;
+    ///
+    /// assert_eq!(Ipv4::new(10, 0, 0, 1).is_private(), true);
+    /// assert_eq!(Ipv4::new(10, 10, 10, 10).is_private(), true);
+    /// assert_eq!(Ipv4::new(172, 16, 10, 10).is_private(), true);
+    /// assert_eq!(Ipv4::new(172, 29, 45, 14).is_private(), true);
+    /// assert_eq!(Ipv4::new(172, 32, 0, 2).is_private(), false);
+    /// assert_eq!(Ipv4::new(192, 168, 0, 2).is_private(), true);
+    /// assert_eq!(Ipv4::new(192, 169, 0, 2).is_private(), false);
     /// ```
     pub fn is_private(&self) -> bool {
         match self.octets() {
@@ -470,7 +496,7 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     /// it is obviously not reserved for future use.
     ///
     /// [IETF RFC 1112]: https://tools.ietf.org/html/rfc1112
-    /// [`true`]: ../../std/primitive.bool.html
+    /// [`true`]: https://doc.rust-lang.org/std/primitive.bool.html
     ///
     /// # Warning
     ///
@@ -482,15 +508,17 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     /// # Examples
     ///
     /// ```
-    /// #![feature(ip)]
-    /// use std::net::Ipv4Addr;
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// assert_eq!(Ipv4Addr::new(240, 0, 0, 0).is_reserved(), true);
-    /// assert_eq!(Ipv4Addr::new(255, 255, 255, 254).is_reserved(), true);
+    /// type Ipv4 = Ipv4Addr<Ipv4AddrInner>;
     ///
-    /// assert_eq!(Ipv4Addr::new(239, 255, 255, 255).is_reserved(), false);
+    /// assert_eq!(Ipv4::new(240, 0, 0, 0).is_reserved(), true);
+    /// assert_eq!(Ipv4::new(255, 255, 255, 254).is_reserved(), true);
+    ///
+    /// assert_eq!(Ipv4::new(239, 255, 255, 255).is_reserved(), false);
     /// // The broadcast address is not considered as reserved for future use by this implementation
-    /// assert_eq!(Ipv4Addr::new(255, 255, 255, 255).is_reserved(), false);
+    /// assert_eq!(Ipv4::new(255, 255, 255, 255).is_reserved(), false);
     /// ```
     pub fn is_reserved(&self) -> bool {
         self.octets()[0] & 240 == 240 && !self.is_broadcast()
@@ -500,17 +528,19 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     /// [IETF RFC 6598] (`100.64.0.0/10`).
     ///
     /// [IETF RFC 6598]: https://tools.ietf.org/html/rfc6598
-    /// [`true`]: ../../std/primitive.bool.html
+    /// [`true`]: https://doc.rust-lang.org/std/primitive.bool.html
     ///
     /// # Examples
     ///
     /// ```
-    /// #![feature(ip)]
-    /// use std::net::Ipv4Addr;
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// assert_eq!(Ipv4Addr::new(100, 64, 0, 0).is_shared(), true);
-    /// assert_eq!(Ipv4Addr::new(100, 127, 255, 255).is_shared(), true);
-    /// assert_eq!(Ipv4Addr::new(100, 128, 0, 0).is_shared(), false);
+    /// type Ipv4 = Ipv4Addr<Ipv4AddrInner>;
+    ///
+    /// assert_eq!(Ipv4::new(100, 64, 0, 0).is_shared(), true);
+    /// assert_eq!(Ipv4::new(100, 127, 255, 255).is_shared(), true);
+    /// assert_eq!(Ipv4::new(100, 128, 0, 0).is_shared(), false);
     /// ```
     pub fn is_shared(&self) -> bool {
         self.octets()[0] == 100 && (self.octets()[1] & 0b1100_0000 == 0b0100_0000)
@@ -522,15 +552,18 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     /// W. Richard Stevens, p. 891; see also [ip7].
     ///
     /// [ip7]: http://man7.org/linux/man-pages/man7/ip.7.html
-    /// [`true`]: ../../std/primitive.bool.html
+    /// [`true`]: https://doc.rust-lang.org/std/primitive.bool.html
     ///
     /// # Examples
     ///
     /// ```
-    /// use std::net::Ipv4Addr;
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// assert_eq!(Ipv4Addr::new(0, 0, 0, 0).is_unspecified(), true);
-    /// assert_eq!(Ipv4Addr::new(45, 22, 13, 197).is_unspecified(), false);
+    /// type Ipv4 = Ipv4Addr<Ipv4AddrInner>;
+    ///
+    /// assert_eq!(Ipv4::new(0, 0, 0, 0).is_unspecified(), true);
+    /// assert_eq!(Ipv4::new(45, 22, 13, 197).is_unspecified(), false);
     /// ```
     pub fn is_unspecified(&self) -> bool {
         self == &Self::UNSPECIFIED
@@ -540,16 +573,23 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     ///
     /// a.b.c.d becomes ::a.b.c.d
     ///
-    /// [IPv6 address]: ../../std/net/struct.Ipv6Addr.html
+    /// [IPv6 address]: ../addr_hal/struct.Ipv6Addr.html
     ///
     /// # Examples
     ///
     /// ```
-    /// use std::net::{Ipv4Addr, Ipv6Addr};
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
+    ///
+    /// use addr_hal::Ipv6Addr;
+    /// use addr_mock::Ipv6AddrInner;
+    ///
+    /// type Ipv4 = Ipv4Addr<Ipv4AddrInner>;
+    /// type Ipv6 = Ipv6Addr<Ipv6AddrInner>;
     ///
     /// assert_eq!(
-    ///     Ipv4Addr::new(192, 0, 2, 255).to_ipv6_compatible(),
-    ///     Ipv6Addr::new(0, 0, 0, 0, 0, 0, 49152, 767)
+    ///     Ipv4::new(192, 0, 2, 255).to_ipv6_compatible(),
+    ///     Ipv6::new(0, 0, 0, 0, 0, 0, 49152, 767)
     /// );
     /// ```
     pub fn to_ipv6_compatible<IV6: Ipv6Address>(&self) -> Ipv6Addr<IV6> {
@@ -563,15 +603,22 @@ impl<IV4: Ipv4Address> Ipv4Addr<IV4> {
     ///
     /// a.b.c.d becomes ::ffff:a.b.c.d
     ///
-    /// [IPv6 address]: ../../std/net/struct.Ipv6Addr.html
+    /// [IPv6 address]: ../addr_hal/struct.Ipv6Addr.html
     ///
     /// # Examples
     ///
     /// ```
-    /// use std::net::{Ipv4Addr, Ipv6Addr};
+    /// use addr_hal::Ipv4Addr;
+    /// use addr_mock::Ipv4AddrInner;
     ///
-    /// assert_eq!(Ipv4Addr::new(192, 0, 2, 255).to_ipv6_mapped(),
-    ///            Ipv6Addr::new(0, 0, 0, 0, 0, 65535, 49152, 767));
+    /// use addr_hal::Ipv6Addr;
+    /// use addr_mock::Ipv6AddrInner;
+    ///
+    /// type Ipv4 = Ipv4Addr<Ipv4AddrInner>;
+    /// type Ipv6 = Ipv6Addr<Ipv6AddrInner>;
+    ///
+    /// assert_eq!(Ipv4::new(192, 0, 2, 255).to_ipv6_mapped(),
+    ///            Ipv6::new(0, 0, 0, 0, 0, 65535, 49152, 767));
     /// ```
     pub fn to_ipv6_mapped<IV6: Ipv6Address>(&self) -> Ipv6Addr<IV6> {
         let octets = self.octets();

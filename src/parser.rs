@@ -7,7 +7,7 @@
 //! This module is "publicly exported" through the `FromStr` implementations below.
 
 use crate::{
-    IpAddr, Ipv4Addr, Ipv4Address, Ipv6Addr, Ipv6Address, SocketAddrV4, SocketAddrV6,
+    IpAddr, Ipv4Addr, Ipv4Address, Ipv6Addr, Ipv6Address, SocketAddr, SocketAddrV4, SocketAddrV6,
     SocketAddressV4, SocketAddressV6,
 };
 use core::fmt;
@@ -326,19 +326,19 @@ impl<SA6: SocketAddressV6> FromStr for SocketAddrV6<SA6> {
         }
     }
 }
-//
-// impl FromStr for SocketAddr {
-//     type Err = AddrParseError;
-//     fn from_str(s: &str) -> Result<SocketAddr, AddrParseError> {
-//         if let Some(addr) = Parser::new(s).read_till_eof(|p| p.read_socket_addr_v4()) {
-//             Ok(SocketAddr::V4(addr))
-//         } else if let Some(addr) = Parser::new(s).read_till_eof(|p| p.read_socket_addr_v6()) {
-//             Ok(SocketAddr::V6(addr))
-//         } else {
-//             Err(AddrParseError(()))
-//         }
-//     }
-/* } */
+
+impl<SA4: SocketAddressV4, SA6: SocketAddressV6> FromStr for SocketAddr<SA4, SA6> {
+    type Err = AddrParseError;
+    fn from_str(s: &str) -> Result<SocketAddr<SA4, SA6>, AddrParseError> {
+        if let Some(addr) = Parser::new(s).read_till_eof(|p| p.read_socket_addr_v4()) {
+            Ok(SocketAddr::V4(addr))
+        } else if let Some(addr) = Parser::new(s).read_till_eof(|p| p.read_socket_addr_v6()) {
+            Ok(SocketAddr::V6(addr))
+        } else {
+            Err(AddrParseError(()))
+        }
+    }
+}
 
 /// An error which can be returned when parsing an IP address or a socket address.
 ///

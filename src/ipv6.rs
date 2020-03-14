@@ -89,7 +89,6 @@ pub enum Ipv6MulticastScope {
 /// assert_eq!("::1".parse(), Ok(localhost));
 /// assert_eq!(localhost.is_loopback(), true);
 /// ```
-#[derive(Copy)]
 pub struct Ipv6Addr<IV6: Ipv6Address> {
     inner: IV6,
 }
@@ -659,6 +658,8 @@ impl<IV6: Ipv6Address> Clone for Ipv6Addr<IV6> {
         }
     }
 }
+
+impl<IV6: Ipv6Address> Copy for Ipv6Addr<IV6> {}
 
 impl<IV6: Ipv6Address> PartialEq for Ipv6Addr<IV6> {
     fn eq(&self, other: &Ipv6Addr<IV6>) -> bool {

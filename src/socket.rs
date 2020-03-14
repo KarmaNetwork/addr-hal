@@ -262,9 +262,37 @@ impl<SA4: SocketAddressV4, SA6: SocketAddressV6> hash::Hash for SocketAddr<SA4, 
 
 pub enum ToSocketAddrError {}
 
+/// A trait for objects which can be converted or resolved to one or more
+/// [`SocketAddr`] values.
+///
+/// This trait is used for generic address resolution when constructing network
+/// objects. By default it is implemented for the following types:
+///
+///  * [`SocketAddr`]: [`to_socket_addrs`] is the identity function.
+///
+///  * [`SocketAddrV4`], [`SocketAddrV6`], `(`[`IpAddr`]`, `[`u16`]`)`,
+///    `(`[`Ipv4Addr`]`, `[`u16`]`)`, `(`[`Ipv6Addr`]`, `[`u16`]`)`:
+///    [`to_socket_addrs`] constructs a [`SocketAddr`] trivially.
+///
+///  * `(`[`&str`]`, `[`u16`]`)`: the string should be either a string representation
+///    of an [`IpAddr`] address as expected by [`FromStr`] implementation or a host
+///    name.
+///
+///  * [`&str`]: the string should be either a string representation of a
+///    [`SocketAddr`] as expected by its [`FromStr`] implementation or a string like
+///    `<host_name>:<port>` pair where `<port>` is a [`u16`] value.
 pub trait ToSocketAddrs<SA4: SocketAddressV4, SA6: SocketAddressV6> {
+    /// Returned iterator over socket addresses which this type may correspond
+    /// to.
     type Iter: Iterator<Item = SocketAddr<SA4, SA6>>;
 
+    /// Converts this object to an iterator of resolved `SocketAddr`s.
+    ///
+    /// The returned iterator may not actually yield any values depending on the
+    /// outcome of any resolution performed.
+    ///
+    /// Note that this function may block the current thread while resolution is
+    /// performed.
     fn to_socket_addrs(&self) -> Result<Self::Iter, ToSocketAddrError>;
 }
 

@@ -1,6 +1,7 @@
 use crate::{Ipv4Addr, Ipv4Address, Ipv6Addr, Ipv6Address};
 use core::cmp::Ordering;
 use core::fmt;
+use core::hash;
 
 /// An IP address, either IPv4 or IPv6.
 ///
@@ -27,7 +28,7 @@ use core::fmt;
 /// assert_eq!(localhost_v4.is_ipv6(), false);
 /// assert_eq!(localhost_v4.is_ipv4(), true);
 /// ```
-#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash, PartialOrd, Ord)]
+// #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash, PartialOrd, Ord)]
 pub enum IpAddr<IV4: Ipv4Address, IV6: Ipv6Address> {
     /// An IPv4 address.
     V4(Ipv4Addr<IV4>),
@@ -206,6 +207,23 @@ impl<IV4: Ipv4Address, IV6: Ipv6Address> IpAddr<IV4, IV6> {
     }
 }
 
+impl<IV4: Ipv4Address, IV6: Ipv6Address> Clone for IpAddr<IV4, IV6> {
+    fn clone(&self) -> Self {
+        match self {
+            IpAddr::V4(ref a) => IpAddr::V4(a.clone()),
+            IpAddr::V6(ref a) => IpAddr::V6(a.clone()),
+        }
+    }
+}
+
+impl<IV4: Ipv4Address, IV6: Ipv6Address> Copy for IpAddr<IV4, IV6> {}
+
+impl<IV4: Ipv4Address, IV6: Ipv6Address> fmt::Debug for IpAddr<IV4, IV6> {
+    fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(self, fmt)
+    }
+}
+
 impl<IV4: Ipv4Address, IV6: Ipv6Address> fmt::Display for IpAddr<IV4, IV6> {
     fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -224,6 +242,17 @@ impl<IV4: Ipv4Address, IV6: Ipv6Address> From<Ipv4Addr<IV4>> for IpAddr<IV4, IV6
 impl<IV4: Ipv4Address, IV6: Ipv6Address> From<Ipv6Addr<IV6>> for IpAddr<IV4, IV6> {
     fn from(ipv6: Ipv6Addr<IV6>) -> IpAddr<IV4, IV6> {
         IpAddr::V6(ipv6)
+    }
+}
+
+impl<IV4: Ipv4Address, IV6: Ipv6Address> Eq for IpAddr<IV4, IV6> {}
+
+impl<IV4: Ipv4Address, IV6: Ipv6Address> PartialEq<IpAddr<IV4, IV6>> for IpAddr<IV4, IV6> {
+    fn eq(&self, other: &IpAddr<IV4, IV6>) -> bool {
+        match self {
+            IpAddr::V4(v4) => v4 == other,
+            IpAddr::V6(v6) => v6 == other,
+        }
     }
 }
 
@@ -259,6 +288,34 @@ impl<IV4: Ipv4Address, IV6: Ipv6Address> PartialEq<IpAddr<IV4, IV6>> for Ipv6Add
         match other {
             IpAddr::V4(_) => false,
             IpAddr::V6(v6) => self == v6,
+        }
+    }
+}
+
+impl<IV4: Ipv4Address, IV6: Ipv6Address> hash::Hash for IpAddr<IV4, IV6> {
+    fn hash<H: hash::Hasher>(&self, s: &mut H) {
+        match self {
+            IpAddr::V4(ref a) => a.hash(s),
+            IpAddr::V6(ref a) => a.hash(s),
+        }
+    }
+}
+
+impl<IV4: Ipv4Address, IV6: Ipv6Address> Ord for IpAddr<IV4, IV6> {
+    fn cmp(&self, other: &IpAddr<IV4, IV6>) -> Ordering {
+        match (self, other) {
+            (IpAddr::V4(s_v4), IpAddr::V4(o_v4)) => s_v4.cmp(o_v4),
+            (IpAddr::V6(s_v6), IpAddr::V6(o_v6)) => s_v6.cmp(o_v6),
+            _ => Ordering::Equal,
+        }
+    }
+}
+
+impl<IV4: Ipv4Address, IV6: Ipv6Address> PartialOrd<IpAddr<IV4, IV6>> for IpAddr<IV4, IV6> {
+    fn partial_cmp(&self, other: &IpAddr<IV4, IV6>) -> Option<Ordering> {
+        match self {
+            IpAddr::V4(v4) => v4.partial_cmp(other),
+            IpAddr::V6(v6) => v6.partial_cmp(other),
         }
     }
 }
@@ -368,3 +425,4 @@ impl<IV4: Ipv4Address, IV6: Ipv6Address> From<[u16; 8]> for IpAddr<IV4, IV6> {
         IpAddr::V6(Ipv6Addr::from(segments))
     }
 }
+

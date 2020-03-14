@@ -28,4 +28,5 @@ pub use socket6::SocketAddressV6;
 
 mod socket;
 pub use socket::SocketAddr;
-
+pub use socket::ToSocketAddrError;
+pub use socket::ToSocketAddrs;
