@@ -13,5 +13,5 @@ repository = "https://github.com/KarmaNetwork/addr-hal"
 [dependencies]
 
 [dev-dependencies]
-addr-mock = { path = "../addr-mock" }
+addr-mock = "0.1"
 
