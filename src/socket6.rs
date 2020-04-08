@@ -66,7 +66,7 @@ pub trait SocketAddressV6: Clone + Copy {
 /// assert_eq!(socket.port(), 8080);
 /// ```
 pub struct SocketAddrV6<SA6: SocketAddressV6> {
-    inner: SA6,
+    pub inner: SA6,
 }
 
 impl<SA6: SocketAddressV6> SocketAddrV6<SA6> {

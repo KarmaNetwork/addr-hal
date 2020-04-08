@@ -53,7 +53,7 @@ pub trait SocketAddressV4: Clone + Copy {
 /// assert_eq!(socket.port(), 8080);
 /// ```
 pub struct SocketAddrV4<SA4: SocketAddressV4> {
-    inner: SA4,
+    pub inner: SA4,
 }
 
 impl<SA4: SocketAddressV4> SocketAddrV4<SA4> {
