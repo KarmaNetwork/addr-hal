@@ -260,6 +260,7 @@ impl<SA4: SocketAddressV4, SA6: SocketAddressV6> hash::Hash for SocketAddr<SA4, 
     }
 }
 
+#[derive(Debug)]
 pub enum ToSocketAddrError {}
 
 /// A trait for objects which can be converted or resolved to one or more
