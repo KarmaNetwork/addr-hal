@@ -175,4 +175,3 @@ impl<SA4: SocketAddressV4> hash::Hash for SocketAddrV4<SA4> {
         (ip.octets(), port).hash(s)
     }
 }
-
