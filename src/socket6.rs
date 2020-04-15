@@ -289,4 +289,3 @@ impl<SA6: SocketAddressV6> hash::Hash for SocketAddrV6<SA6> {
             .hash(s)
     }
 }
-

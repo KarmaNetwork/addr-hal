@@ -748,4 +748,3 @@ impl<IV6: Ipv6Address> From<[u16; 8]> for Ipv6Addr<IV6> {
         Ipv6Addr::new(a, b, c, d, e, f, g, h)
     }
 }
-

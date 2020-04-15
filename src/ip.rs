@@ -425,4 +425,3 @@ impl<IV4: Ipv4Address, IV6: Ipv6Address> From<[u16; 8]> for IpAddr<IV4, IV6> {
         IpAddr::V6(Ipv6Addr::from(segments))
     }
 }
-
